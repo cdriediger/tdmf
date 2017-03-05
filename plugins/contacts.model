@@ -1,0 +1,35 @@
+{
+  "store_in": {
+    "collection": "contacts",
+    "database": "test"
+},
+  "fields": {
+    "titel": {
+      "type": "String"
+    },
+    "first_name": {
+      "type": "String"
+    },
+    "last_name": {
+      "type": "String"
+    },
+    "telephone": {
+      "type": "String"
+    },
+    "email": {
+      "type": "String"
+    },
+    "language": {
+      "type": "String"
+    },
+    "email_invoice": {
+      "type": "Boolean"
+    },
+    "address": {
+      "type": "ForignDocument"
+    },
+    "shipping_addres": {
+      "type": "ForignDocument"
+    }
+  }
+}

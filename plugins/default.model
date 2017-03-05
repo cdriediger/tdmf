@@ -1,0 +1,20 @@
+{
+  "fields": {
+    "document_id": {
+      "type": "DocumentID"
+      "default": DocumentID.new
+    },
+    "created": {
+      "type": "DateTime"
+      "default": Time.now
+    },
+    "last_name": {
+      "type": "DateTime"
+      "default": Time.now
+    },
+    "active": {
+      "type": "Boolean"
+      "default": true
+    }
+  }
+}
