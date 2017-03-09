@@ -1,10 +1,10 @@
 require 'rubygems'
-#require 'jimson'
+require 'jimson'
 require 'mongoid'
 require 'binding_of_caller'
 require_relative 'DBManager'
 require_relative 'PluginManager'
-require_relative 'jimson/lib/jimson'
+#require_relative 'jimson/lib/jimson'
 
 class RPCServer < Jimson::Server
 
@@ -37,14 +37,19 @@ class RPCServer < Jimson::Server
   def dispatch_request(method, params)
     method_name = method.to_s
     handler = @router.handler_for_method(method_name)
-    puts "Got handler: #{handler}"
+    puts "Got handler: #{handler} #{handler.class}"
     method_name = @router.strip_method_namespace(method_name)
 
-    if handler.nil? \
-    || !handler.jimson_exposed_methods.include?(method_name) \
-    || !handler.respond_to?(method_name)
-      puts "No Method #{method_name} found in #{handler}. "
-      puts "Availeble Methods: %%%% #{handler.jimson_exposed_methods} %%%%"
+    if handler.nil?
+      puts "Handler not found"
+      raise Jimson::Server::Error::MethodNotFound.new(method)
+    end
+    unless handler.class.jimson_exposed_methods.include?(method_name)
+      puts "Method not found"
+      raise Jimson::Server::Error::MethodNotFound.new(method)
+    end
+    unless handler.class.respond_to?(method_name)
+      puts "Handler does not respond"
       raise Jimson::Server::Error::MethodNotFound.new(method)
     end
 
@@ -53,7 +58,7 @@ class RPCServer < Jimson::Server
     elsif params.is_a?(Hash)
       return handler.send(method_name, params)
     else
-      return handler.send(method_name, *params)
+      return handler.class.send(method_name, *params)
     end
   end
 

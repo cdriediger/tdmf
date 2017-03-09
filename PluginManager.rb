@@ -53,7 +53,7 @@ class Plugins < Hash
     puts("loading Model for plugin #{pluginname}")
     $db.load_model(pluginname, plugin_file_path)
     self[pluginname.to_sym] = Object.const_get(pluginname)
-    self[pluginname.to_sym] .init_plugin
+    self[pluginname.to_sym].init_plugin
   end
 
 end

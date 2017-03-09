@@ -10,56 +10,57 @@ class DBManager
   end
 
   def load_model(model_name, plugin_file_path)
+    @model_name = model_name
     model_filepath = plugin_file_path.split('.')[0..-2].join('.') + '.model'
     puts model_filepath
     model_definition = JSON.parse(File.open(model_filepath).read)
 
-    model_class = Class.new(Object.const_get(model_name + 'Controller')) do
-      include Mongoid::Document
-      if model_definition.has_key?('store_in')
-        store_in database: model_definition['store_in']['database'] if model_definition['store_in'].has_key?('database')
-        store_in collection: model_definition['store_in']['collection'] if model_definition['store_in'].has_key?('collection')
+    @model_controller = Class.new(Object.const_get(@model_name + 'Controller')) do
+      @model = Class.new do
+        include Mongoid::Document
+        if model_definition.has_key?('store_in')
+          store_in database: model_definition['store_in']['database'] if model_definition['store_in'].has_key?('database')
+          store_in collection: model_definition['store_in']['collection'] if model_definition['store_in'].has_key?('collection')
+        end
+
+        field :document_id, type: DocumentID, default: ->{ DocumentID.new }
+        field :created, type: DateTime, default: ->{ Time.now }
+        field :updated, type: DateTime, default: ->{ Time.now }
+        field :active, type: Boolean, default: true
+
+        @fields = model_definition['fields']
+        @fields.each_pair do |field_name, file_attributes|
+          field_type = file_attributes['type']
+
+          field field_name.to_sym, type: Object.const_get(field_type)
+          puts "Adding Field: #{field_name} Type: #{field_type}"
+        end
       end
 
-      field :document_id, type: DocumentID, default: ->{ DocumentID.new }
-      field :created, type: DateTime, default: ->{ Time.now }
-      field :updated, type: DateTime, default: ->{ Time.now }
-      field :active, type: Boolean, default: true
-
-      @fields = model_definition['fields']
-      @fields.each_pair do |field_name, file_attributes|
-        field_type = file_attributes['type']
-
-        field field_name.to_sym, type: Object.const_get(field_type)
-        puts "Adding Field: #{field_name} Type: #{field_type}"
+      def self.create(*args)
+        puts "Creating #{@model_name}"
+	puts "Args: #{args}"
+	@model.create!(args)
+	puts "Created entry"
       end
 
-      def update(*args)
-        puts "Updating Document #{self} at update"
-        super
-        method(:update).super_method.call(updated: Time.now)
-      end
-
-      def update!(*args)
-        puts "Updating Document #{self} at update!"
-        super
-        method(:update!).super_method.call(updated: Time.now)
-      end
-
-      def save(*args)
-        puts "Updating Document #{self} at save"
-        super
-        method(:save).super_method.call(updated: Time.now)
-      end
-
-      def save!(*args)
-        puts "Updating Document #{self} at save!"
-        super
-        method(:save!).super_method.call(updated: Time.now)
+      def self.get(filter, selected_keys=nil)
+	puts "cllaed Get Filter: #{filter}, selected_keys: #{selected_keys}"
+	if selected_keys	
+	  x = @model.where(filter).first.as_document.to_h.select do |key, value|
+            puts "test if #{key} in #{selected_keys}"
+            selected_keys.include?(key)
+	  end
+	  puts x.class
+	  x
+	else
+      	  @model.where(filter).first
+	end
       end
     end
 
-    Object.const_set(model_name, model_class)
+    Object.const_set(@model_name, @model_controller)
+    puts "Created Class #{@model_name}"
   end
 end
 
