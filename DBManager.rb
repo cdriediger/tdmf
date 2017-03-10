@@ -46,16 +46,30 @@ class DBManager
 
       def self.get(filter, selected_keys=nil)
 	puts "cllaed Get Filter: #{filter}, selected_keys: #{selected_keys}"
-	if selected_keys	
-	  x = @model.where(filter).first.as_document.to_h.select do |key, value|
-            puts "test if #{key} in #{selected_keys}"
-            selected_keys.include?(key)
+	result = []
+	if selected_keys
+	  @model.where(filter).each do |entry|
+	    result << entry.as_document.to_h.select do |key, value|
+              puts "test if #{key} in #{selected_keys}"
+              selected_keys.include?(key)
+	    end
 	  end
-	  puts x.class
-	  x
+	  result
 	else
-      	  @model.where(filter).first
+      	  @model.where(filter).each do |entry|
+            result << entry.as_document.to_h
+	  end
+	  result
 	end
+      end
+
+      def self.update(filter, modifier)
+	modifier['updated'] = Time.now
+        @model.where(filter).update(modifier)
+      end
+
+      def self.delete(filter)
+	@model.where(filter).delete
       end
     end
 

@@ -22,8 +22,14 @@ end
 
 client = RPCClient.new("http://127.0.0.1:8999")
 client.open_namespace(:contacts)
-#client.contacts.create(titel: 'Mr.', first_name: 'Name2', last_name: 'Lastname2')
-puts client.contacts.get({"first_name":"Name2"}, ['last_name'])
+puts client.contacts.test_method
+#client.contacts.create(titel: 'Mr.', first_name: 'Name4', last_name: 'Lastname4')
+#puts client.contacts.get({"first_name":"Name4", last_name: 'Lastname4'}, ['created', 'updated'])
+#puts '#############'
+#puts client.contacts.get({"first_name":"Name4", last_name: 'Lastname4'})
+#puts '###############'
+#client.contacts.update({"first_name":"Name4", last_name: 'Lastname41'}, {last_name: 'Lastname4'})
+#puts client.contacts.get({"first_name":"Name4", last_name: 'Lastname4'})
 
 
 

@@ -124,7 +124,8 @@ db = DB.new
 #100.times do |i|
 #	Contact.create!(titel: 'Mr.', first_name: "#{i} First_name", last_name: "#{i} Last_name", email: "#{i}.user@db", age: Random.rand(17..67), flag: @flags.sample)
 #end
-#a1 = Address.create!(street: 'Allee1', city: 'Paderborn', postalcode: '33098', country: 'DE')
+a1 = Address.create!(street: 'Allee1', city: 'Paderborn', postalcode: '33098', country: 'DE')
+puts a1.class
 #c1 = Contact.create!(titel: 'Mr.', first_name: 'Stephan', last_name: 'Raab', email: 's.raab@raab.de')
 #c1.invoice_address.create
 #a1 = Address.where("_id": "58877f936e955209a85eecba").first
@@ -134,11 +135,11 @@ db = DB.new
 #c1 = Contact.where("id": "5889e5656e955209664bda22").first
 #s2 = Contact.where("first_name": "Oliver").first
 #puts c1.first_name == "119 First_name"
-c1 = Contact.where("first_name": "Stephan").first
-c1.update(email: "a@b.c")
+#c1 = Contact.where("first_name": "Stephan").first
+#c1.update(email: "a@b.c")
 #c1.first_name = "Test Contact"
-sleep 1
-c1.save
+#sleep 1
+#c1.save
 #c1.last_name = "voll der Otto"
 #c1.save
 #c1.address = ForignDocument.new(a1)
