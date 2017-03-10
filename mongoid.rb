@@ -121,11 +121,22 @@ end
 #Mongoid.load!('./mongoid.yml', :development)
 db = DB.new
 @flags = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+puts Contact.fields.select { |key, val| val.type.to_s == "ForignDocument" }.keys
+
+
+
+
+
+
+
+
+
+
 #100.times do |i|
 #	Contact.create!(titel: 'Mr.', first_name: "#{i} First_name", last_name: "#{i} Last_name", email: "#{i}.user@db", age: Random.rand(17..67), flag: @flags.sample)
 #end
-a1 = Address.create!(street: 'Allee1', city: 'Paderborn', postalcode: '33098', country: 'DE')
-puts a1.class
+#a1 = Address.create!(street: 'Allee1', city: 'Paderborn', postalcode: '33098', country: 'DE')
+#puts a1.class
 #c1 = Contact.create!(titel: 'Mr.', first_name: 'Stephan', last_name: 'Raab', email: 's.raab@raab.de')
 #c1.invoice_address.create
 #a1 = Address.where("_id": "58877f936e955209a85eecba").first

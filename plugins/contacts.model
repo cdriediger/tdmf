@@ -28,7 +28,7 @@
     "address": {
       "type": "ForignDocument"
     },
-    "shipping_addres": {
+    "shipping_address": {
       "type": "ForignDocument"
     }
   }

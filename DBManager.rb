@@ -35,37 +35,51 @@ class DBManager
           field field_name.to_sym, type: Object.const_get(field_type)
           puts "Adding Field: #{field_name} Type: #{field_type}"
         end
+
+	def self.forign_documents
+	  return self.fields.select { |key, val| val.type.to_s == "ForignDocument" }.keys
+	end
+
       end
 
       def self.create(*args)
-        puts "Creating #{@model_name}"
-	puts "Args: #{args}"
-	@model.create!(args)
-	puts "Created entry"
+        args[0].each_pair do |key, val|
+	  args[0][key] = ForignDocument.new(val) if @model.forign_documents.include?(key)
+	end
+	doc = @model.create!(args)
+	return doc[0][:document_id]
+      end
+
+      def self.get_by_id(id, selected_keys=nil)
+        return self.get({document_id: id}, selected_keys)
       end
 
       def self.get(filter, selected_keys=nil)
-	puts "cllaed Get Filter: #{filter}, selected_keys: #{selected_keys}"
+	puts "called Get Filter: #{filter}, selected_keys: #{selected_keys}"
 	result = []
 	if selected_keys
 	  @model.where(filter).each do |entry|
-	    result << entry.as_document.to_h.select do |key, value|
+	    entry = entry.as_document.to_h.select do |key, value|
               puts "test if #{key} in #{selected_keys}"
               selected_keys.include?(key)
 	    end
+	    entry.delete("_id")
+	    result << entry
 	  end
-	  result
 	else
       	  @model.where(filter).each do |entry|
-            result << entry.as_document.to_h
+            entry = entry.as_document.to_h
+	    entry.delete("_id")
+	    result <<  entry
 	  end
-	  result
 	end
+	return result
       end
 
       def self.update(filter, modifier)
 	modifier['updated'] = Time.now
-        @model.where(filter).update(modifier)
+        doc = @model.where(filter).update(modifier)
+	return doc[0][:document_id]
       end
 
       def self.delete(filter)
@@ -80,7 +94,7 @@ end
 
 class DocumentID
 
-  def initialize(id=nil)
+  def initialize
     @id = self.class.gen_new_id
   end
 
@@ -107,9 +121,10 @@ end
 
 class ForignDocument
 
-  def initialize(document)
-    @document = document
-    @docId = document.id.to_s
+  def initialize(doc_id, doc_type)
+    @doc_id = doc_id
+    @doc_type = doc_type
+    @document = 
     @docType = document.class
   end
 
