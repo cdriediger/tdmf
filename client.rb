@@ -1,5 +1,5 @@
-#require_relative 'jimson/lib/jimson'
-require 'jimson'
+require_relative 'jimson/lib/jimson'
+#require 'jimson'
 require 'securerandom'
 
 class RPCClient
@@ -23,9 +23,12 @@ end
 client = RPCClient.new("http://127.0.0.1:8999")
 client.open_namespace(:contacts)
 client.open_namespace(:address)
-a1 = client.address.create(street: 'Stephnausstr. 23', plz: '33098', city: 'Paderborn', country: 'Germany')
-client.contacts.create(titel: 'Mr.', first_name: 'Christoph', last_name: 'Driediger', address: a1)
-#puts client.contacts.get({"first_name":"Name4", last_name: 'Lastname4'}, ['created', 'updated'])
+#a1 = client.address.create(street: 'Stephnausstr. 23', plz: '33098', city: 'Paderborn', country: 'Germany')
+#puts a1
+#c1 = client.contacts.create({titel: 'Mr.', first_name: 'Christoph', last_name: 'Driediger', address: a1})
+#puts c1
+c2 = client.contacts.get({"first_name":"Christoph"})
+puts c2
 #puts '#############'
 #puts client.contacts.get({"first_name":"Name4", last_name: 'Lastname4'})
 #puts '###############'

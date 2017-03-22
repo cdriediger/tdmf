@@ -1,6 +1,7 @@
-class ArticlesController < Plugin
+class Articles < Plugin
 
-  def self.init_plugin
+  def self.init_plugin(model)
+    @model = model
   end
 
 end

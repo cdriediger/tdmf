@@ -23,12 +23,9 @@
       "type": "String"
     },
     "email_invoice": {
-      "type": "Boolean"
+      "type": "Boolean" 
     },
     "address": {
-      "type": "ForignDocument"
-    },
-    "shipping_address": {
       "type": "ForignDocument"
     }
   }

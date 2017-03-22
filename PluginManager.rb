@@ -51,9 +51,9 @@ class Plugins < Hash
 
     puts("loaded Plugin #{pluginname}")
     puts("loading Model for plugin #{pluginname}")
-    $db.load_model(pluginname, plugin_file_path)
+    model = $db.load_model(pluginname, plugin_file_path)
     self[pluginname.to_sym] = Object.const_get(pluginname)
-    self[pluginname.to_sym].init_plugin
+    self[pluginname.to_sym].init_plugin(model)
   end
 
 end
@@ -65,6 +65,11 @@ class Plugin
     methods << 'new'
     methods.delete('jimson_exposed_methods')
     methods
+  end
+
+  def self.method_missing(method_name, *args, &block)
+    puts "No Method #{method_name} found" unless @model.methods.include?(method_name)
+    @model.send(method_name, args) 
   end
 
 end

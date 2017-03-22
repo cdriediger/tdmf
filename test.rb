@@ -1,9 +1,11 @@
-toast = Proc.new do
-  puts Time.new
+class Test
+
+	def initialize(a:"a", b:"b")
+		puts "A: #{a}"
+		puts "B: #{b}"
+	end
+
 end
 
-toast.call
-sleep 1
-toast.call
-sleep 1
-toast.call
+Test.new(a: "1", b: "2")
+Test.new(b: "2")

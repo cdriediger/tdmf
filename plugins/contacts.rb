@@ -1,6 +1,7 @@
-class ContactsController < Plugin
+class Contacts < Plugin
 
-  def self.init_plugin
+  def self.init_plugin(model)
+    @model = model
   end
 
   def self.test_method

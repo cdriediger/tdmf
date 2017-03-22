@@ -1,10 +1,10 @@
 require 'rubygems'
-require 'jimson'
-require 'mongoid'
+#require 'jimson'
+#require 'mongoid'
 require 'binding_of_caller'
-require_relative 'DBManager'
+require_relative 'DBManager2'
 require_relative 'PluginManager'
-#require_relative 'jimson/lib/jimson'
+require_relative 'jimson/lib/jimson'
 
 class RPCServer < Jimson::Server
 
@@ -40,18 +40,18 @@ class RPCServer < Jimson::Server
     puts "Got handler: #{handler} #{handler.class}"
     method_name = @router.strip_method_namespace(method_name)
 
-    if handler.nil?
-      puts "Handler not found"
-      raise Jimson::Server::Error::MethodNotFound.new(method)
-    end
-    unless handler.class.jimson_exposed_methods.include?(method_name)
-      puts "Method not found"
-      raise Jimson::Server::Error::MethodNotFound.new(method)
-    end
-    unless handler.class.respond_to?(method_name)
-      puts "Handler does not respond"
-      raise Jimson::Server::Error::MethodNotFound.new(method)
-    end
+#    if handler.nil?
+#      puts "Handler not found"
+#      raise Jimson::Server::Error::MethodNotFound.new(method)
+#    end
+#    unless handler.class.jimson_exposed_methods.include?(method_name)
+#      puts "Method #{method_name} not found in #{handler.class.jimson_exposed_methods}"
+#      raise Jimson::Server::Error::MethodNotFound.new(method)
+#    end
+#    unless handler.class.respond_to?(method_name)
+#      puts "Handler does not respond"
+#      raise Jimson::Server::Error::MethodNotFound.new(method)
+#    end
 
     if params.nil?
       return handler.send(method_name)
@@ -83,5 +83,4 @@ $plugins.each do |name, plugin|
   puts "Adding Namespace for Plugin #{name}"
   server.add_namespace(plugin, name)
 end
-puts "Models: #{Mongoid.models}"
 server.start

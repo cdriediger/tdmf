@@ -23,13 +23,15 @@ class DBManager
           store_in collection: model_definition['store_in']['collection'] if model_definition['store_in'].has_key?('collection')
         end
 
-        field :document_id, type: DocumentID, default: ->{ DocumentID.new }
+	@@name = model_name.clone
+
+        field :document_id, type: DocumentID, default: ->{ DocumentID.new(model_name) }
         field :created, type: DateTime, default: ->{ Time.now }
         field :updated, type: DateTime, default: ->{ Time.now }
         field :active, type: Boolean, default: true
 
-        @fields = model_definition['fields']
-        @fields.each_pair do |field_name, file_attributes|
+	@@fields = model_definition['fields']
+        @@fields.each_pair do |field_name, file_attributes|
           field_type = file_attributes['type']
 
           field field_name.to_sym, type: Object.const_get(field_type)
@@ -40,14 +42,26 @@ class DBManager
 	  return self.fields.select { |key, val| val.type.to_s == "ForignDocument" }.keys
 	end
 
+	def self.name
+	  return @@name
+	end
+
       end
 
-      def self.create(*args)
-        args[0].each_pair do |key, val|
-	  args[0][key] = ForignDocument.new(val) if @model.forign_documents.include?(key)
+      def self.create(data)
+        puts "Creating new #{@model.name}"
+        data.each_pair do |key, val|
+	  puts "Testing if #{key} is a ForignDocument"
+	  if @model.forign_documents.include?(key)
+     	    data[key] = ForignDocument.new(val) if @model.forign_documents.include?(key)
+	    puts "Found ForignDocument: #{key}"
+	  end
 	end
-	doc = @model.create!(args)
-	return doc[0][:document_id]
+	puts "Finaly creating Document with Data: #{data}"
+	doc = @model.create!(data)
+	puts doc
+	puts doc.class
+	return doc[:document_id]
       end
 
       def self.get_by_id(id, selected_keys=nil)
@@ -59,7 +73,7 @@ class DBManager
 	result = []
 	if selected_keys
 	  @model.where(filter).each do |entry|
-	    entry = entry.as_document.to_h.select do |key, value|
+	    entry = entry.to_h.select do |key, value|
               puts "test if #{key} in #{selected_keys}"
               selected_keys.include?(key)
 	    end
@@ -68,7 +82,10 @@ class DBManager
 	  end
 	else
       	  @model.where(filter).each do |entry|
-            entry = entry.as_document.to_h
+            puts "Got Entry from Database: #{entry}"
+            entry.each do |field|
+	      puts "Found field in Entry: #{field}"
+	    end
 	    entry.delete("_id")
 	    result <<  entry
 	  end
@@ -94,8 +111,10 @@ end
 
 class DocumentID
 
-  def initialize
-    @id = self.class.gen_new_id
+  def initialize(model_name)
+    puts "Creating DocumentID for Model: #{model_name}"
+    @id = model_name + "#" + self.class.gen_new_id
+    @type = model_name
   end
 
   def mongoize
@@ -121,24 +140,22 @@ end
 
 class ForignDocument
 
-  def initialize(doc_id, doc_type)
+  def initialize(doc_id)
     @doc_id = doc_id
-    @doc_type = doc_type
-    @document = 
-    @docType = document.class
+    puts "Creating ForingDocument ID: #{@doc_id}"
   end
 
   def mongoize
-    JSON.generate([@docId, @docType])
+    @doc_id
   end
 
   class << self
 
     def demongoize(id)
-      return nil unless id
       puts "Restoring Forign Document: #{id}"
-      docId, docType = JSON.parse(id)
-      Object.const_get(docType).where("_id": docId).first
+      type = id.split('#')[0]
+      puts "Type of Object: #{type}"
+      Object.const_get(type).get({"document_id": id}).first
     end
 
   end
